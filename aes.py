@@ -53,10 +53,34 @@ def shiftRow(list):
   return final
 
 def byteSubstitution(list):
-    newList = []
-    for i in range(0,16):
-      newList.append(SBox[list[i]])
-    return newList
+  newList = []
+  for i in range(0,16):
+    newList.append(SBox[list[i]])
+  return newList
+
+def multiply(k,num):
+  if k == 0:
+    return 0
+  if k == 1:
+    return num
+  if k == 2:
+    return 2 * num % 256
+  if k == 3:
+    return (2 * num % 256) ^ (num)
+
+def mixColumn(list):
+  newList = []
+  multiplier = [2,1,1,3,3,2,1,1,1,3,2,1,1,1,3,2]
+  u = []
+  v = []
+  for i in range(0,4):
+    u += [2 * (i // 2)]
+    v += [i % 2]
+  for i in range(0,16):
+    a = i % 4
+    b = i // 4
+    newList += [multiply(multiplier[a],list[4*b]) ^ multiply(multiplier[a+4],list[4*b+1]) ^ multiply(multiplier[a+8],list[4*b+2]) ^ multiply(multiplier[a+12],list[4*b+3])]
+  return newList
 
 hexkey = []
 #convert key to hex
@@ -82,3 +106,13 @@ hexOut(state)
 state = shiftRow(state)
 print(state)
 hexOut(state)
+
+state = mixColumn(state)
+print(state)
+hexOut(state)
+
+print(multiply(1,99))
+print(multiply(2,47))
+print(multiply(3,175))
+print(multiply(1,162))
+print((99^94)^241^162)
