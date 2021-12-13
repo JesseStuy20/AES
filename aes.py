@@ -52,22 +52,29 @@ def shiftRow(list):
     #add rotated values to list
   return final
 
+#use lookup table
 def byteSubstitution(list):
   newList = []
-  for i in range(0,16):
+  for i in range(0,len(list)):
     newList.append(SBox[list[i]])
   return newList
 
-def multiply(k,num):
+print(byteSubstitution([32,70,117,103]))
+
+#multiplication with small numbers
+def simplify(k,num):
   if k == 0:
     return 0
   if k == 1:
     return num
   if k == 2:
-    return 2 * num % 256
+    if 2*num < 256:
+      return 2*num
+    return (2*num) ^ 283
   if k == 3:
-    return (2 * num % 256) ^ (num)
+    return simplify(2,num) ^ num
 
+#mix columns by multiplying matrix
 def mixColumn(list):
   newList = []
   multiplier = [2,1,1,3,3,2,1,1,1,3,2,1,1,1,3,2]
@@ -79,8 +86,37 @@ def mixColumn(list):
   for i in range(0,16):
     a = i % 4
     b = i // 4
-    newList += [multiply(multiplier[a],list[4*b]) ^ multiply(multiplier[a+4],list[4*b+1]) ^ multiply(multiplier[a+8],list[4*b+2]) ^ multiply(multiplier[a+12],list[4*b+3])]
+    newList += [simplify(multiplier[a],list[4*b]) ^ simplify(multiplier[a+4],list[4*b+1]) ^ simplify(multiplier[a+8],list[4*b+2]) ^ simplify(multiplier[a+12],list[4*b+3])]
   return newList
+
+def rotatevec(v):
+  return [v[1],v[2],v[3],v[0]]
+
+def iterateRoundKey(list):
+  v0 = [ord(list[0]),ord(list[1]),ord(list[2]),ord(list[3])]
+  v1 = [ord(list[4]),ord(list[5]),ord(list[6]),ord(list[7])]
+  v2 = [ord(list[8]),ord(list[9]),ord(list[10]),ord(list[11])]
+  v3 = [ord(list[12]),ord(list[13]),ord(list[14]),ord(list[15])]
+  print(v0,v1,v2,v3)
+  w3 = rotatevec(v3)
+  print(w3)
+  v = byteSubstitution(w3)
+  v[0] = v[0]^1
+  w4 = []
+  w5 = []
+  w6 = []
+  w7 = []
+  for i in range(0,4):
+    w4.append(v0[i]^v[i])
+  for i in range(0,4):
+    w5.append(v1[i]^w4[i])
+  for i in range(0,4):
+    w6.append(v2[i]^w5[i])
+  for i in range(0,4):
+    w7.append(v3[i]^w6[i])
+  return w4+w5+w6+w7
+  
+  
 
 hexkey = []
 #convert key to hex
@@ -111,8 +147,8 @@ state = mixColumn(state)
 print(state)
 hexOut(state)
 
-print(multiply(1,99))
-print(multiply(2,47))
-print(multiply(3,175))
-print(multiply(1,162))
-print((99^94)^241^162)
+key1 = iterateRoundKey(key)
+print(key)
+hexOut(key)
+
+
