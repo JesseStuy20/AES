@@ -96,19 +96,25 @@ def mixColumn(list):
     newList += [simplify(multiplier[a],list[4*b]) ^ simplify(multiplier[a+4],list[4*b+1]) ^ simplify(multiplier[a+8],list[4*b+2]) ^ simplify(multiplier[a+12],list[4*b+3])]
   return newList
 
+def rCon(j):
+  if j == 1:
+    return 1
+  else:
+    if 2*rCon(j-1) < 256:
+      return 2*rCon(j-1)
+    return (2*rCon(j-1))^283
+
 def rotatevec(v):
   return [v[1],v[2],v[3],v[0]]
 
-def iterateRoundKey(list):
+def iterateRoundKey(list,k):
   v0 = [list[0],list[1],list[2],list[3]]
   v1 = [list[4],list[5],list[6],list[7]]
   v2 = [list[8],list[9],list[10],list[11]]
   v3 = [list[12],list[13],list[14],list[15]]
-  print(v0,v1,v2,v3)
   w3 = rotatevec(v3)
-  print(w3)
   v = byteSubstitution(w3)
-  v[0] = v[0]^1
+  v[0] = v[0]^rCon(k)
   w4 = []
   w5 = []
   w6 = []
@@ -137,11 +143,9 @@ for i in inp:
 
 #xor hexed key and inp together
 state = xor(hexkey,hexinp)
-print("inital xor")
-print(state)
-hexOut(state)
-print("-------------")
 
+
+'''
 #byte substitution
 state = byteSubstitution(state)
 print("byte substitution")
@@ -164,7 +168,7 @@ hexOut(state)
 print("-------------")
 
 #round key xor round 1
-key1 = iterateRoundKey(hexkey)
+key1 = iterateRoundKey(hexkey,1)
 print("round key 1")
 print(key1)
 hexOut(key1)
@@ -174,3 +178,25 @@ state = xor(key1,state)
 print("xored with round key 1")
 print(state)
 hexOut(state)
+'''
+
+def fullIteration(state,key):
+  state = byteSubstitution(state)
+  state = shiftRow(state)
+  state = mixColumn(state)
+  state = xor(state,key)
+  return state
+
+
+
+def fullCipherText(state,hexkey):
+  for i in range(1,10):
+    hexkey = iterateRoundKey(hexkey,i)
+    state = fullIteration(state,hexkey)
+  hexkey = iterateRoundKey(hexkey,10)
+  state = xor((shiftRow(byteSubstitution(state))),hexkey)
+  return state
+
+hexOut(fullCipherText(state,hexkey))
+  
+
