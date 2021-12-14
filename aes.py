@@ -41,6 +41,13 @@ def hexOut(list):
         out += hex(i)[2:4] + ' '
     print(out)
 
+#method to xor lists
+def xor(key,inp):
+    xoredList = []
+    for i in range(0,len(key)):
+      xoredList += [key[i] ^ inp[i]]
+    return xoredList
+
 #row offset method (2nd row shifted 1 space left, 3rd row 2 spaces left, 4th row 3 spaces left)
 def shiftRow(list):
   final = []
@@ -93,10 +100,10 @@ def rotatevec(v):
   return [v[1],v[2],v[3],v[0]]
 
 def iterateRoundKey(list):
-  v0 = [ord(list[0]),ord(list[1]),ord(list[2]),ord(list[3])]
-  v1 = [ord(list[4]),ord(list[5]),ord(list[6]),ord(list[7])]
-  v2 = [ord(list[8]),ord(list[9]),ord(list[10]),ord(list[11])]
-  v3 = [ord(list[12]),ord(list[13]),ord(list[14]),ord(list[15])]
+  v0 = [list[0],list[1],list[2],list[3]]
+  v1 = [list[4],list[5],list[6],list[7]]
+  v2 = [list[8],list[9],list[10],list[11]]
+  v3 = [list[12],list[13],list[14],list[15]]
   print(v0,v1,v2,v3)
   w3 = rotatevec(v3)
   print(w3)
@@ -115,8 +122,8 @@ def iterateRoundKey(list):
   for i in range(0,4):
     w7.append(v3[i]^w6[i])
   return w4+w5+w6+w7
-  
-  
+
+
 
 hexkey = []
 #convert key to hex
@@ -129,26 +136,41 @@ for i in inp:
   hexinp += [ord(i)]
 
 #xor hexed key and inp together
-state = []
-for i in range(0,16):
-  state += [hexkey[i] ^ hexinp[i]]
+state = xor(hexkey,hexinp)
+print("inital xor")
+print(state)
+hexOut(state)
+print("-------------")
 
 #byte substitution
 state = byteSubstitution(state)
-
+print("byte substitution")
 print(state)
 hexOut(state)
+print("-------------")
 
+#shift rows
 state = shiftRow(state)
+print("shift rows")
 print(state)
 hexOut(state)
+print("-------------")
 
+#mix columns
 state = mixColumn(state)
+print("mix columns")
 print(state)
 hexOut(state)
+print("-------------")
 
-key1 = iterateRoundKey(key)
-print(key)
-hexOut(key)
+#round key xor round 1
+key1 = iterateRoundKey(hexkey)
+print("round key 1")
+print(key1)
+hexOut(key1)
+print("-------------")
 
-
+state = xor(key1,state)
+print("xored with round key 1")
+print(state)
+hexOut(state)
