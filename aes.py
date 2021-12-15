@@ -66,8 +66,6 @@ def byteSubstitution(list):
     newList.append(SBox[list[i]])
   return newList
 
-print(byteSubstitution([32,70,117,103]))
-
 #multiplication with small numbers
 def simplify(k,num):
   if k == 0:
@@ -141,44 +139,18 @@ hexinp = []
 for i in inp:
   hexinp += [ord(i)]
 
-#xor hexed key and inp together
-state = xor(hexkey,hexinp)
 
 
-'''
-#byte substitution
-state = byteSubstitution(state)
-print("byte substitution")
-print(state)
-hexOut(state)
-print("-------------")
+def roundKey(lst,k):
+  newlst = []
+  for i in lst:
+    newlst += [i]
+  for j in range(1,k+1):
+    newlst = iterateRoundKey(newlst,j)
+  return newlst
+      
 
-#shift rows
-state = shiftRow(state)
-print("shift rows")
-print(state)
-hexOut(state)
-print("-------------")
 
-#mix columns
-state = mixColumn(state)
-print("mix columns")
-print(state)
-hexOut(state)
-print("-------------")
-
-#round key xor round 1
-key1 = iterateRoundKey(hexkey,1)
-print("round key 1")
-print(key1)
-hexOut(key1)
-print("-------------")
-
-state = xor(key1,state)
-print("xored with round key 1")
-print(state)
-hexOut(state)
-'''
 
 def fullIteration(state,key):
   state = byteSubstitution(state)
@@ -189,14 +161,43 @@ def fullIteration(state,key):
 
 
 
-def fullCipherText(state,hexkey):
+def fullCipherText(hexinp,hexkey):
+  state = xor(hexkey,hexinp)
   for i in range(1,10):
-    hexkey = iterateRoundKey(hexkey,i)
-    state = fullIteration(state,hexkey)
-  hexkey = iterateRoundKey(hexkey,10)
-  state = xor((shiftRow(byteSubstitution(state))),hexkey)
+    newkey = roundKey(hexkey,i)
+    state = fullIteration(state,newkey)
+  newkey = roundKey(hexkey,10)
+  state = xor((shiftRow(byteSubstitution(state))),newkey)
   return state
 
-hexOut(fullCipherText(state,hexkey))
+
+def inverseMixColumn(list):
+  return mixColumn(mixColumn(mixColumn(list)))
+
+def inverseShiftRow(list):
+  return shiftRow(shiftRow(shiftRow(list)))
+
+def inverseSubstituteByte(list):
+  newList = []
+  for i in range(0,len(list)):
+    newList.append(SBox.index(list[i]))
+  return newList
+
+
+def reverseIteration(state,key):
+  state = xor(state,key)
+  state = inverseMixColumn(state)
+  state = inverseShiftRow(state)
+  state = inverseSubstituteByte(state)
+  return state
+
+hexOut(reverseIteration([9,102,139,120,162,209,154,101,240,252,230,196,123,59,48,137],roundKey(hexkey,9)))
+hexOut([9,102,139,120,162,209,154,101,240,252,230,196,123,59,48,137])
+  
+  
+
+hexOut(fullCipherText(hexinp,hexkey))
+
+
   
 
