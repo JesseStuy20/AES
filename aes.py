@@ -34,6 +34,38 @@ SBox = [0x63 ,0x7c ,0x77 ,0x7b ,0xf2 ,0x6b ,0x6f ,0xc5 ,0x30 ,0x01 ,0x67 ,0x2b ,
  ,0xe1 ,0xf8 ,0x98 ,0x11 ,0x69 ,0xd9 ,0x8e ,0x94 ,0x9b ,0x1e ,0x87 ,0xe9 ,0xce ,0x55 ,0x28 ,0xdf
  ,0x8c ,0xa1 ,0x89 ,0x0d ,0xbf ,0xe6 ,0x42 ,0x68 ,0x41 ,0x99 ,0x2d ,0x0f ,0xb0 ,0x54 ,0xbb ,0x16]
 
+#converts string to decimal
+def hexString(string):
+  final = []
+  for i in string:
+    final += [ord(i)]
+  return final
+
+#converts key to decimal
+hexkey = hexString(key)
+
+#fills input with spaces at the end
+inputlst = []
+if len(inp) % 16 != 0:
+  inp += " "*(16-(len(inp) % 16))
+
+#creates a list of lists, each a block of 16 of the input text
+for i in range(0,len(inp)//16):
+  inputlst += [hexString(inp[16*i:16*(i+1)])]
+
+
+#creates the kth round key
+def roundKey(lst,k):
+  newlst = []
+  for i in lst:
+    newlst += [i]
+  for j in range(1,k+1):
+    newlst = iterateRoundKey(newlst,j)
+  return newlst
+
+
+
+
 #method to print out in hex
 def hexOut(list):
     out = ""
@@ -94,6 +126,8 @@ def mixColumn(list):
     newList += [simplify(multiplier[a],list[4*b]) ^ simplify(multiplier[a+4],list[4*b+1]) ^ simplify(multiplier[a+8],list[4*b+2]) ^ simplify(multiplier[a+12],list[4*b+3])]
   return newList
 
+
+#compute powers of 2 in GF(2^8)
 def rCon(j):
   if j == 1:
     return 1
@@ -102,9 +136,11 @@ def rCon(j):
       return 2*rCon(j-1)
     return (2*rCon(j-1))^283
 
+#rotates a vector
 def rotatevec(v):
   return [v[1],v[2],v[3],v[0]]
 
+#computes the next round key
 def iterateRoundKey(list,k):
   v0 = [list[0],list[1],list[2],list[3]]
   v1 = [list[4],list[5],list[6],list[7]]
@@ -128,26 +164,6 @@ def iterateRoundKey(list,k):
   return w4+w5+w6+w7
 
 
-
-hexkey = []
-#convert key to hex
-for i in key:
-  hexkey += [ord(i)]
-
-hexinp = []
-#convert inp to hex
-for i in inp:
-  hexinp += [ord(i)]
-
-
-
-def roundKey(lst,k):
-  newlst = []
-  for i in lst:
-    newlst += [i]
-  for j in range(1,k+1):
-    newlst = iterateRoundKey(newlst,j)
-  return newlst
       
 
 
@@ -161,7 +177,7 @@ def fullIteration(state,key):
 
 
 
-def fullCipherText(hexinp,hexkey):
+def blockEncrypt(hexinp,hexkey):
   state = xor(hexkey,hexinp)
   for i in range(1,10):
     newkey = roundKey(hexkey,i)
@@ -191,12 +207,50 @@ def reverseIteration(state,key):
   state = inverseSubstituteByte(state)
   return state
 
-hexOut(reverseIteration([9,102,139,120,162,209,154,101,240,252,230,196,123,59,48,137],roundKey(hexkey,9)))
-hexOut([9,102,139,120,162,209,154,101,240,252,230,196,123,59,48,137])
-  
-  
+def blockDecrypt(hexinp,hexkey):
+  state = xor(hexinp,roundKey(hexkey,10))
+  state = inverseShiftRow(state)
+  state = inverseSubstituteByte(state)
+  for i in range(9,0,-1):
+    state = reverseIteration(state,roundKey(hexkey,i))
+  state = xor(state,hexkey)
+  return state
 
-hexOut(fullCipherText(hexinp,hexkey))
+def fullEncrypt(inp,key):
+  inputlst = []
+  final = []
+  if len(inp) % 16 != 0:
+    inp += " "*(16-(len(inp) % 16))
+  for i in range(0,len(inp)//16):
+    inputlst += [hexString(inp[16*i:16*(i+1)])]
+  for lst in inputlst:
+    final += blockEncrypt(lst,hexkey)
+  return final
+
+def fullDecrypt(inp,key):
+  inputlst = []
+  final = []
+  if len(inp) % 16 != 0:
+    inp += " "*(16-(len(inp) % 16))
+  for i in range(0,len(inp)//16):
+    inputlst += [hexString(inp[16*i:16*(i+1)])]
+  for lst in inputlst:
+    final += blockEncrypt(lst,hexkey)
+  return final
+
+
+
+if mode == "encrypt":
+  hexOut(fullEncrypt(inp,hexkey))
+elif mode == "decrypt":
+  for lst in inputlst:
+    final += fullDecrypt(lst,hexkey)
+else:
+  print("Error: Incorrect input")
+
+
+
+
 
 
   
