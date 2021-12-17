@@ -1,9 +1,15 @@
 Rishabh Das
 -------------------
 12/14/21 (Classwork): Finished the encryption process in aes.py.
+12/15/21 (Classwork): Added reverse methods to decrypt in aes.py.
+12/16/21 (Classwork): Added modes and block division in aes.py.
+12/17/21 (Classwork): Got decrypt and encrypt modes to fully work in aes.py.
 
 
 Jesse Xie
 -------------------
 12/14/21 (Classwork): Finished the encryption process in aes.py.
+12/15/21 (Classwork): Added reverse methods to decrypt in aes.py.
+12/16/21 (Classwork): Added modes and block division in aes.py.
+12/17/21 (Classwork): Got decrypt and encrypt modes to fully work in aes.py.
 

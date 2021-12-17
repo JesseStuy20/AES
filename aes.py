@@ -2,15 +2,17 @@ import sys
 mode = sys.argv[1]
 keyfile = sys.argv[2]
 inpfile = sys.argv[3]
-key = open(keyfile,"r").read()[:-1]
-inp = open(inpfile,"r").read()[:-1]
+key = open(keyfile,"r").read()
+if key[-1] == "\n":
+  key = key[:-1]
+inp = open(inpfile,"r").read()
+if inp[-1] == "\n":
+  inp = inp[:-1]
 debug = True
 
 if(len(key) != 16):
   print("the key length must be 16 characters")
 
-if(len(inp) != 16):
-  print("the input length must be 16 characters")
 
 if(debug):
   print("mode:"+mode)
@@ -35,23 +37,18 @@ SBox = [0x63 ,0x7c ,0x77 ,0x7b ,0xf2 ,0x6b ,0x6f ,0xc5 ,0x30 ,0x01 ,0x67 ,0x2b ,
  ,0x8c ,0xa1 ,0x89 ,0x0d ,0xbf ,0xe6 ,0x42 ,0x68 ,0x41 ,0x99 ,0x2d ,0x0f ,0xb0 ,0x54 ,0xbb ,0x16]
 
 #converts string to decimal
-def hexString(string):
+def decString(string):
   final = []
   for i in string:
     final += [ord(i)]
   return final
 
 #converts key to decimal
-hexkey = hexString(key)
+hexkey = decString(key)
 
-#fills input with spaces at the end
-inputlst = []
-if len(inp) % 16 != 0:
-  inp += " "*(16-(len(inp) % 16))
 
-#creates a list of lists, each a block of 16 of the input text
-for i in range(0,len(inp)//16):
-  inputlst += [hexString(inp[16*i:16*(i+1)])]
+
+
 
 
 #creates the kth round key
@@ -63,7 +60,14 @@ def roundKey(lst,k):
     newlst = iterateRoundKey(newlst,j)
   return newlst
 
-
+#converts a hex read as a string into decimal
+hexlst = ["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"]
+def hexify(string):
+  a = string[0]
+  b = string[1]
+  x = hexlst.index(a)
+  y = hexlst.index(b)
+  return 16*x+y
 
 
 #method to print out in hex
@@ -222,20 +226,25 @@ def fullEncrypt(inp,key):
   if len(inp) % 16 != 0:
     inp += " "*(16-(len(inp) % 16))
   for i in range(0,len(inp)//16):
-    inputlst += [hexString(inp[16*i:16*(i+1)])]
+    inputlst += [decString(inp[16*i:16*(i+1)])]
   for lst in inputlst:
     final += blockEncrypt(lst,hexkey)
   return final
 
 def fullDecrypt(inp,key):
+  inp = inp.lower()
+  inp = ''.join(inp.split(" "))
   inputlst = []
   final = []
-  if len(inp) % 16 != 0:
-    inp += " "*(16-(len(inp) % 16))
-  for i in range(0,len(inp)//16):
-    inputlst += [hexString(inp[16*i:16*(i+1)])]
+  new = []
+  for i in range(0,len(inp),2):
+    new += [hexify(inp[i:i+2])]
+  if len(new) % 16 != 0:
+    new += [32]*(16-(len(new) % 16))
+  for i in range(0,len(new)//16):
+    inputlst += [new[16*i:16*(i+1)]]
   for lst in inputlst:
-    final += blockEncrypt(lst,hexkey)
+    final += blockDecrypt(lst,hexkey)
   return final
 
 
@@ -243,8 +252,10 @@ def fullDecrypt(inp,key):
 if mode == "encrypt":
   hexOut(fullEncrypt(inp,hexkey))
 elif mode == "decrypt":
-  for lst in inputlst:
-    final += fullDecrypt(lst,hexkey)
+  printout = ""
+  for i in fullDecrypt(inp,hexkey):
+    printout += chr(i)
+  print(printout)
 else:
   print("Error: Incorrect input")
 
