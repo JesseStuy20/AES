@@ -4,6 +4,7 @@ Rishabh Das
 12/15/21 (Classwork): Added reverse methods to decrypt in aes.py.
 12/16/21 (Classwork): Added modes and block division in aes.py.
 12/17/21 (Classwork): Got decrypt and encrypt modes to fully work in aes.py.
+12/20/21 (CLasswork): Worked on slideshow presentation.
 
 
 Jesse Xie
@@ -12,4 +13,5 @@ Jesse Xie
 12/15/21 (Classwork): Added reverse methods to decrypt in aes.py.
 12/16/21 (Classwork): Added modes and block division in aes.py.
 12/17/21 (Classwork): Got decrypt and encrypt modes to fully work in aes.py.
-
+12/20/21 (CLasswork): Worked on slideshow presentation.
+12/21/21 (CLasswork): Continued to work on slideshow presentation, added helper file for block formatting.
