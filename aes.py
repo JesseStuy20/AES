@@ -47,10 +47,6 @@ def decString(string):
 hexkey = decString(key)
 
 
-
-
-
-
 #creates the kth round key
 def roundKey(lst,k):
   newlst = []
@@ -182,7 +178,10 @@ def fullIteration(state,key):
 
 
 def blockEncrypt(hexinp,hexkey):
+  hexOut(hexinp)
+  hexOut(hexkey)
   state = xor(hexkey,hexinp)
+  hexOut(state)
   for i in range(1,10):
     newkey = roundKey(hexkey,i)
     state = fullIteration(state,newkey)
