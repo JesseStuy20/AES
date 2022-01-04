@@ -6,6 +6,9 @@ Rishabh Das
 12/17/21 (Classwork): Got decrypt and encrypt modes to fully work in aes.py.
 12/20/21 (Classwork): Worked on slideshow presentation.
 12/27/21 (At Home): Worked on slideshow presentation.
+01/03/22 (Classwork): Continued to work on slideshow presentation.
+01/03/22 (At Home): Final Touches to code.
+
 
 
 Jesse Xie
@@ -16,4 +19,9 @@ Jesse Xie
 12/17/21 (Classwork): Got decrypt and encrypt modes to fully work in aes.py.
 12/20/21 (Classwork): Worked on slideshow presentation.
 12/21/21 (Classwork): Continued to work on slideshow presentation, added helper file for block formatting.
+12/22/21 (Classwork): Continued to work on slideshow presentation.
+12/23/21 (Classwork): Continued to work on slideshow presentation.
 12/24/21 (At Home): Worked on slideshow presentation.
+01/03/22 (Classwork): Continued to work on slideshow presentation.
+01/03/22 (Homework): Continued to work on and completed slideshow presentation.
+
